@@ -28,9 +28,9 @@ export default function Header({
             variant="secondary"
             onClick={onReset}
             size="sm"
-            className="flex items-center gap-1 flex-1 sm:flex-initial"
+            className="flex items-center gap-1 flex-1 sm:flex-initial btn-hover-effect hover-scale transition-transform"
           >
-            <RefreshCw size={16} />
+            <RefreshCw size={16} className="hover-spin" />
             <span className="sm:inline">New</span>
           </Button>
           
@@ -38,9 +38,9 @@ export default function Header({
             variant="default"
             onClick={onDownload}
             size="sm"
-            className="flex items-center gap-1 flex-1 sm:flex-initial"
+            className="flex items-center gap-1 flex-1 sm:flex-initial btn-hover-effect hover-scale transition-transform"
           >
-            <Download size={16} />
+            <Download size={16} className="group-hover:animate-bounce" />
             <span className="sm:inline">Download</span>
           </Button>
           
@@ -48,9 +48,9 @@ export default function Header({
             variant="outline"
             onClick={onShare}
             size="sm"
-            className="flex items-center gap-1 flex-1 sm:flex-initial"
+            className="flex items-center gap-1 flex-1 sm:flex-initial btn-hover-effect hover-scale transition-transform"
           >
-            <Share size={16} />
+            <Share size={16} className="hover-pulse" />
             <span className="sm:inline">Share</span>
           </Button>
         </div>

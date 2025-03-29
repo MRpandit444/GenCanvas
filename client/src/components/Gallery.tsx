@@ -58,11 +58,11 @@ export default function Gallery({
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {artworks.map((artwork, index) => (
-            <div key={index} className="relative group rounded-lg overflow-hidden shadow-sm border border-gray-100">
+            <div key={index} className="relative group rounded-lg overflow-hidden shadow-sm border border-gray-100 hover-lift transition-transform">
               <img 
                 src={artwork.imageUrl} 
                 alt={`Artwork ${index + 1}`}
-                className="w-full aspect-square object-cover cursor-pointer" 
+                className="w-full aspect-square object-cover cursor-pointer transition-all hover:scale-105" 
                 onClick={() => onLoadArtwork(artwork.settings)}
               />
               {/* Display on mobile without hover */}
@@ -73,21 +73,21 @@ export default function Gallery({
                 <div className="flex space-x-1 sm:space-x-2">
                   <button 
                     onClick={() => onLoadArtwork(artwork.settings)} 
-                    className="p-1 rounded-md hover:bg-gray-200 text-primary"
+                    className="p-1 rounded-md hover:bg-gray-200 text-primary transition-colors"
                   >
-                    <Edit size={16} />
+                    <Edit size={16} className="hover-pulse" />
                   </button>
                   <button 
                     onClick={() => onDownload(artwork.imageUrl, index)} 
-                    className="p-1 rounded-md hover:bg-gray-200 text-blue-600"
+                    className="p-1 rounded-md hover:bg-gray-200 text-blue-600 transition-colors"
                   >
-                    <Download size={16} />
+                    <Download size={16} className="hover-float" />
                   </button>
                   <button 
                     onClick={() => handleDelete(index)} 
-                    className="p-1 rounded-md hover:bg-gray-200 text-red-500"
+                    className="p-1 rounded-md hover:bg-gray-200 text-red-500 transition-colors"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={16} className="hover-wiggle" />
                   </button>
                 </div>
               </div>
@@ -97,24 +97,24 @@ export default function Gallery({
                 <div className="flex space-x-2">
                   <button 
                     onClick={() => onLoadArtwork(artwork.settings)} 
-                    className="p-2 bg-white rounded-full hover:bg-gray-100"
+                    className="p-2 bg-white rounded-full hover:bg-gray-100 hover-scale transition-transform"
                     title="Edit artwork"
                   >
-                    <Edit className="text-primary" size={18} />
+                    <Edit className="text-primary hover-pulse" size={18} />
                   </button>
                   <button 
                     onClick={() => onDownload(artwork.imageUrl, index)} 
-                    className="p-2 bg-white rounded-full hover:bg-gray-100"
+                    className="p-2 bg-white rounded-full hover:bg-gray-100 hover-scale transition-transform"
                     title="Download artwork"
                   >
-                    <Download className="text-blue-600" size={18} />
+                    <Download className="text-blue-600 hover-float" size={18} />
                   </button>
                   <button 
                     onClick={() => handleDelete(index)} 
-                    className="p-2 bg-white rounded-full hover:bg-gray-100"
+                    className="p-2 bg-white rounded-full hover:bg-gray-100 hover-scale transition-transform"
                     title="Delete artwork"
                   >
-                    <Trash2 className="text-red-500" size={18} />
+                    <Trash2 className="text-red-500 hover-wiggle" size={18} />
                   </button>
                 </div>
               </div>

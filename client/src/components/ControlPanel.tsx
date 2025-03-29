@@ -505,24 +505,24 @@ export default function ControlPanel({
                   <div className="flex items-center">
                     <button
                       onClick={(e) => { e.stopPropagation(); toggleLayerVisibility(index); }}
-                      className="mr-2 text-gray-500 hover:text-gray-700"
+                      className="mr-2 text-gray-500 hover:text-gray-700 hover-scale transition-transform"
                     >
-                      {layer.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                      {layer.visible ? <Eye className="h-4 w-4 hover-pulse" /> : <EyeOff className="h-4 w-4 hover-pulse" />}
                     </button>
                     <span className="text-sm font-medium">{`Layer ${index + 1}`}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <button
                       onClick={(e) => { e.stopPropagation(); duplicateLayer(index); }}
-                      className="text-gray-500 hover:text-gray-700 p-1"
+                      className="text-gray-500 hover:text-gray-700 p-1 hover-scale transition-transform"
                     >
-                      <Copy className="h-4 w-4" />
+                      <Copy className="h-4 w-4 hover-pulse" />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); deleteLayer(index); }}
-                      className="text-gray-500 hover:text-red-500 p-1"
+                      className="text-gray-500 hover:text-red-500 p-1 hover-scale transition-transform"
                     >
-                      <Trash className="h-4 w-4" />
+                      <Trash className="h-4 w-4 hover-wiggle" />
                     </button>
                   </div>
                 </div>
@@ -622,10 +622,10 @@ export default function ControlPanel({
       {/* Generate Button */}
       <Button 
         onClick={onGenerate}
-        className="w-full py-4 sm:py-6 mt-4 bg-primary hover:bg-primary/90 text-white font-semibold"
+        className="w-full py-4 sm:py-6 mt-4 bg-primary hover:bg-primary/90 text-white font-semibold btn-hover-effect hover-scale transition-transform"
       >
         <span className="flex items-center justify-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sparkles"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M3 5h4"/><path d="M19 17v4"/><path d="M17 19h4"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sparkles hover-pulse"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M3 5h4"/><path d="M19 17v4"/><path d="M17 19h4"/></svg>
           Generate New Artwork
         </span>
       </Button>
