@@ -31,7 +31,8 @@ export default function InteractiveControls({
   const [params, setParams] = useState<InteractionParams>({
     strength: 50,
     radius: 150,
-    fadeSpeed: 3
+    fadeSpeed: 3,
+    delay: 5
   });
 
   // Update interaction parameters when they change
@@ -49,7 +50,7 @@ export default function InteractiveControls({
         toastMessage = 'Interactive mode disabled';
         break;
       case InteractionMode.FOLLOW:
-        toastMessage = 'Elements will follow your cursor';
+        toastMessage = 'Elements will follow your cursor with a trailing effect';
         break;
       case InteractionMode.REPEL:
         toastMessage = 'Elements will move away from your cursor';
@@ -80,6 +81,10 @@ export default function InteractiveControls({
   
   const handleFadeSpeedChange = (value: number[]) => {
     setParams(prev => ({ ...prev, fadeSpeed: value[0] }));
+  };
+  
+  const handleDelayChange = (value: number[]) => {
+    setParams(prev => ({ ...prev, delay: value[0] }));
   };
 
   return (
@@ -157,7 +162,7 @@ export default function InteractiveControls({
                 <p>Select an interaction mode to play with your artwork</p>
               )}
               {currentMode === InteractionMode.FOLLOW && (
-                <p>Elements will follow your cursor with a delay effect</p>
+                <p>Elements will follow your cursor with a smooth trailing motion effect</p>
               )}
               {currentMode === InteractionMode.REPEL && (
                 <p>Elements will be pushed away from your cursor</p>
@@ -203,6 +208,25 @@ export default function InteractiveControls({
                   onValueChange={handleRadiusChange}
                 />
               </div>
+              
+              {currentMode === InteractionMode.FOLLOW && (
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <Label>Trail Delay</Label>
+                    <span className="text-sm text-muted-foreground">{params.delay}</span>
+                  </div>
+                  <Slider 
+                    value={[params.delay]} 
+                    min={1} 
+                    max={10} 
+                    step={1} 
+                    onValueChange={handleDelayChange}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Higher values create longer trails with more lag between elements
+                  </p>
+                </div>
+              )}
               
               {currentMode === InteractionMode.DRAW && (
                 <div className="space-y-2">

@@ -17,10 +17,15 @@ export class InteractionManager {
   private isActive: boolean = false;
   private mouseX: number = 0;
   private mouseY: number = 0;
+  // Track previous mouse positions for delay effect
+  private mousePositionHistory: Array<{x: number, y: number}> = [];
+  private historyMaxLength: number = 20; // Maximum number of positions to remember
+  private lastUpdateTime: number = 0;
   private interactionParams: Record<string, any> = {
     strength: 50, // 0-100
     radius: 150,  // pixels
     fadeSpeed: 3, // 1-10
+    delay: 5, // 1-10 delay factor (higher means more delay)
     particles: [] // For drawing mode
   };
   private interactions: Map<InteractionMode, (p: any, params: ArtParams) => void> = new Map();
@@ -93,6 +98,22 @@ export class InteractionManager {
     this.mouseX = e.clientX - rect.left;
     this.mouseY = e.clientY - rect.top;
     this.isActive = true;
+    
+    // Update mouse position history for delay effect
+    const now = Date.now();
+    if (now - this.lastUpdateTime > 30) { // Update history at most 30ms apart
+      this.updateMouseHistory(this.mouseX, this.mouseY);
+      this.lastUpdateTime = now;
+    }
+  }
+  
+  // Function to update mouse position history for delay effects
+  private updateMouseHistory(x: number, y: number) {
+    this.mousePositionHistory.unshift({ x, y });
+    // Keep history size limited
+    if (this.mousePositionHistory.length > this.historyMaxLength) {
+      this.mousePositionHistory.pop();
+    }
   }
 
   private onMouseDown(e: MouseEvent) {
@@ -125,6 +146,13 @@ export class InteractionManager {
     this.mouseX = touch.clientX - rect.left;
     this.mouseY = touch.clientY - rect.top;
     this.isActive = true;
+    
+    // Update mouse position history for delay effect
+    const now = Date.now();
+    if (now - this.lastUpdateTime > 30) { // Update history at most 30ms apart
+      this.updateMouseHistory(this.mouseX, this.mouseY);
+      this.lastUpdateTime = now;
+    }
     
     // For drawing mode, add point to current path
     if (this.mode === InteractionMode.DRAW && this.interactionParams.particles.length > 0) {
@@ -170,6 +198,12 @@ export class InteractionManager {
     const p5 = this.generator.p5Instance;
     const strength = this.interactionParams.strength / 100;
     const radius = this.interactionParams.radius;
+    const delayFactor = this.interactionParams.delay || 5; // Control how much delay/lag in the trail
+    
+    // Make sure we have a history of mouse positions
+    if (this.mousePositionHistory.length === 0) {
+      this.updateMouseHistory(this.mouseX, this.mouseY);
+    }
     
     // Apply to all layers
     params.layers.forEach(layer => {
@@ -181,30 +215,51 @@ export class InteractionManager {
       buffer.push();
       buffer.translate(buffer.width/2, buffer.height/2);
       
-      // Draw elements attracted to mouse
+      // Draw elements attracted to mouse with different delays
       const count = Math.max(1, Math.floor(layer.complexity / 2));
       for (let i = 0; i < count; i++) {
+        // Calculate delay index based on element index and delay factor
+        // This spreads elements through the history trail
+        const delayIndex = Math.min(
+          this.mousePositionHistory.length - 1,
+          Math.floor(i * delayFactor / count)
+        );
+        
+        // Get delayed position from history
+        const delayedPosition = this.mousePositionHistory[delayIndex] || { 
+          x: this.mouseX, 
+          y: this.mouseY 
+        };
+        
+        // Calculate base position in a circle
         const angle = p5.map(i, 0, count, 0, p5.TWO_PI);
-        const xOffset = p5.cos(angle) * radius * (1 - strength);
-        const yOffset = p5.sin(angle) * radius * (1 - strength);
+        const baseRadius = Math.min(buffer.width, buffer.height) * 0.3;
+        const baseX = p5.cos(angle) * baseRadius;
+        const baseY = p5.sin(angle) * baseRadius;
         
-        const targetX = this.mouseX - buffer.width/2;
-        const targetY = this.mouseY - buffer.height/2;
+        // Target is the delayed mouse position
+        const targetX = delayedPosition.x - buffer.width/2;
+        const targetY = delayedPosition.y - buffer.height/2;
         
-        const x = p5.lerp(xOffset, targetX, strength);
-        const y = p5.lerp(yOffset, targetY, strength);
+        // Interpolate based on strength
+        const x = p5.lerp(baseX, targetX, strength);
+        const y = p5.lerp(baseY, targetY, strength);
         
+        // Draw element with size variation based on position in trail
         const palette = params.colorPalettes[layer.palette];
         if (palette && palette.colors.length > 0) {
           const colorIndex = i % palette.colors.length;
           buffer.fill(palette.colors[colorIndex]);
           buffer.noStroke();
           
+          // Scale size based on position in trail (first elements are bigger)
+          const sizeFactor = p5.map(delayIndex, 0, Math.min(10, this.mousePositionHistory.length - 1), 1.2, 0.8);
+          
           this.generator?.drawShape(
             buffer, 
             x, 
             y, 
-            layer.elementSize, 
+            layer.elementSize * sizeFactor, 
             layer.shape,
             layer.randomness / 100,
             0
