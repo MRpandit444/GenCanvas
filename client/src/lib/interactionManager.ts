@@ -40,20 +40,60 @@ export class InteractionManager {
   }
 
   initialize(generator: ArtGenerator, canvas: HTMLCanvasElement) {
+    // Clean up previous instance if any
+    if (this.canvas) {
+      console.log('Cleaning up previous canvas before initializing');
+      this.destroy();
+    }
+    
     this.generator = generator;
     this.canvas = canvas;
     
-    // Add event listeners
+    // Add event listeners with proper binding
     if (canvas) {
-      canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
-      canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-      canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
-      canvas.addEventListener('mouseleave', this.onMouseLeave.bind(this));
-      canvas.addEventListener('touchmove', this.onTouchMove.bind(this));
-      canvas.addEventListener('touchstart', this.onTouchStart.bind(this));
-      canvas.addEventListener('touchend', this.onTouchEnd.bind(this));
+      // Store bound references to ensure proper removal later
+      this._boundMouseMove = this.onMouseMove.bind(this);
+      this._boundMouseDown = this.onMouseDown.bind(this);
+      this._boundMouseUp = this.onMouseUp.bind(this);
+      this._boundMouseLeave = this.onMouseLeave.bind(this);
+      this._boundTouchMove = this.onTouchMove.bind(this);
+      this._boundTouchStart = this.onTouchStart.bind(this);
+      this._boundTouchEnd = this.onTouchEnd.bind(this);
+      
+      // Add listeners - use try/catch to handle errors gracefully
+      try {
+        canvas.addEventListener('mousemove', this._boundMouseMove);
+        canvas.addEventListener('mousedown', this._boundMouseDown);
+        canvas.addEventListener('mouseup', this._boundMouseUp);
+        canvas.addEventListener('mouseleave', this._boundMouseLeave);
+        canvas.addEventListener('touchmove', this._boundTouchMove);
+        canvas.addEventListener('touchstart', this._boundTouchStart);
+        canvas.addEventListener('touchend', this._boundTouchEnd);
+        
+        // Initialize mouse history with current mouse position or center of canvas
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        this.mouseX = centerX;
+        this.mouseY = centerY;
+        this.updateMouseHistory(centerX, centerY);
+        
+        console.log('InteractionManager initialized with canvas:', canvas);
+      } catch (error) {
+        console.error('Error setting up event listeners:', error);
+      }
+    } else {
+      console.warn('Cannot initialize InteractionManager: canvas is null');
     }
   }
+  
+  // Store bound event listeners for proper cleanup
+  private _boundMouseMove: ((e: MouseEvent) => void) = () => {};
+  private _boundMouseDown: ((e: MouseEvent) => void) = () => {};
+  private _boundMouseUp: ((e: MouseEvent) => void) = () => {};
+  private _boundMouseLeave: ((e: MouseEvent) => void) = () => {};
+  private _boundTouchMove: ((e: TouchEvent) => void) = () => {};
+  private _boundTouchStart: ((e: TouchEvent) => void) = () => {};
+  private _boundTouchEnd: ((e: TouchEvent) => void) = () => {};
 
   setMode(mode: InteractionMode) {
     this.mode = mode;
@@ -594,18 +634,23 @@ export class InteractionManager {
   // Cleanup
   destroy() {
     if (this.canvas) {
-      this.canvas.removeEventListener('mousemove', this.onMouseMove);
-      this.canvas.removeEventListener('mousedown', this.onMouseDown);
-      this.canvas.removeEventListener('mouseup', this.onMouseUp);
-      this.canvas.removeEventListener('mouseleave', this.onMouseLeave);
-      this.canvas.removeEventListener('touchmove', this.onTouchMove);
-      this.canvas.removeEventListener('touchstart', this.onTouchStart);
-      this.canvas.removeEventListener('touchend', this.onTouchEnd);
+      // Remove event listeners using the bound functions
+      if (this._boundMouseMove) this.canvas.removeEventListener('mousemove', this._boundMouseMove);
+      if (this._boundMouseDown) this.canvas.removeEventListener('mousedown', this._boundMouseDown);
+      if (this._boundMouseUp) this.canvas.removeEventListener('mouseup', this._boundMouseUp);
+      if (this._boundMouseLeave) this.canvas.removeEventListener('mouseleave', this._boundMouseLeave);
+      if (this._boundTouchMove) this.canvas.removeEventListener('touchmove', this._boundTouchMove);
+      if (this._boundTouchStart) this.canvas.removeEventListener('touchstart', this._boundTouchStart);
+      if (this._boundTouchEnd) this.canvas.removeEventListener('touchend', this._boundTouchEnd);
+      
+      console.log('InteractionManager destroyed, removed event listeners');
     }
     
+    // Clear all data
     this.generator = null;
     this.canvas = null;
     this.isActive = false;
+    this.mousePositionHistory = [];
     this.interactionParams.particles = [];
   }
 }

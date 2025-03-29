@@ -252,9 +252,12 @@ export default function Home() {
 
   // Handle interaction mode change
   const handleInteractionModeChange = (mode: InteractionMode) => {
+    console.log('Home: Setting interaction mode to:', mode);
+    
+    // Set the new interaction mode
     setInteractionMode(mode);
     
-    // If enabling interaction mode, turn off animation
+    // If enabling interaction mode, turn off animation for best performance
     if (mode !== InteractionMode.NONE && artParams.animated) {
       setArtParams({
         ...artParams,
@@ -266,6 +269,23 @@ export default function Home() {
         description: "Animation has been turned off for interactive mode"
       });
     }
+    
+    // Ensure interaction params are properly initialized for the specific mode
+    if (mode === InteractionMode.FOLLOW) {
+      // Make sure trail delay is initialized
+      setInteractionParams(prev => ({
+        ...prev,
+        delay: prev.delay || 5 // Default to 5 if not already set
+      }));
+    } else if (mode === InteractionMode.DRAW) {
+      // Make sure fadeSpeed is initialized
+      setInteractionParams(prev => ({
+        ...prev,
+        fadeSpeed: prev.fadeSpeed || 3 // Default to 3 if not already set
+      }));
+    }
+    
+    console.log('Updated interaction params:', interactionParams);
   };
   
   // Handle interaction parameters change

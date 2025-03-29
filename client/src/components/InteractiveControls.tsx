@@ -41,6 +41,9 @@ export default function InteractiveControls({
   }, [params, onParamsChange]);
 
   const handleModeChange = (mode: InteractionMode) => {
+    console.log('InteractiveControls: Setting mode to:', mode);
+    
+    // Apply the change
     onModeChange(mode);
     
     // Show toast with instructions based on mode
@@ -65,6 +68,9 @@ export default function InteractiveControls({
         toastMessage = 'Elements will expand when your cursor is nearby';
         break;
     }
+    
+    // Log active parameters for debugging
+    console.log('Current interaction params:', params);
     
     if (toastMessage) {
       toast({ title: toastMessage });

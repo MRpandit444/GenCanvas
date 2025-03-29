@@ -40,31 +40,39 @@ export default function ArtCanvas({
         generatorRef.current = generator;
       }
       
-      // Store reference to the canvas
+      // Set canvas ready after a short delay to ensure p5 is initialized
       setTimeout(() => {
         if (generator.p5Instance) {
-          // Get the canvas element from the DOM since it's not directly accessible via p5 instance
+          // Get the canvas element from the DOM
           const canvasElement = containerRef.current?.querySelector('canvas');
           if (canvasElement) {
             canvasRef.current = canvasElement;
             
-            // Initialize interaction manager
+            // Initialize interaction manager only once p5 is ready
             const manager = new InteractionManager();
+            console.log('Creating new interaction manager');
             manager.initialize(generator, canvasElement);
             setInteractionManager(manager);
           }
         }
         setCanvasReady(true);
-      }, 100);
+      }, 200); // Slightly longer delay to ensure everything is ready
     }
 
+    // Cleanup function
     return () => {
+      console.log('Cleaning up ArtCanvas component');
+      
+      // Destroy interaction manager first
       if (interactionManager) {
+        console.log('Destroying interaction manager');
         interactionManager.destroy();
         setInteractionManager(null);
       }
       
+      // Then destroy the art generator
       if (artGenerator) {
+        console.log('Destroying art generator');
         artGenerator.destroy();
         setArtGenerator(null);
         if (generatorRef) {
@@ -100,6 +108,20 @@ export default function ArtCanvas({
     if (interactionManager) {
       interactionManager.setMode(interactionMode);
       
+      // Make sure that mouse history is initialized
+      if (interactionMode === InteractionMode.FOLLOW) {
+        const x = window.innerWidth / 2;
+        const y = window.innerHeight / 2;
+        // Force a dummy mouse position to initialize the trail
+        const dummyEvent = new MouseEvent('mousemove', {
+          clientX: x,
+          clientY: y
+        });
+        if (canvasRef.current) {
+          canvasRef.current.dispatchEvent(dummyEvent);
+        }
+      }
+      
       // Modify the p5 draw function to include interactions
       if (artGenerator && artGenerator.p5Instance) {
         const oldDraw = artGenerator.p5Instance.draw;
@@ -114,6 +136,8 @@ export default function ArtCanvas({
             interactionManager.applyInteraction(artGenerator.p5Instance, params);
           }
         };
+        
+        console.log('Interactive mode set to:', interactionMode);
       }
     }
   }, [interactionMode, interactionManager]);
