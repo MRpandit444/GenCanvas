@@ -117,9 +117,9 @@ export default function PresetSelector({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="flex gap-2">
-          <Bookmark size={16} />
-          <span>Presets</span>
+        <Button variant="outline" size="sm" className="flex items-center gap-1.5">
+          <Bookmark size={16} className="flex-shrink-0" />
+          <span className="sm:inline">Presets & Styles</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[625px]">
@@ -152,39 +152,40 @@ export default function PresetSelector({
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4 max-h-[350px] overflow-y-auto p-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[350px] overflow-y-auto p-1">
               {filteredPresets.length > 0 ? (
                 filteredPresets.map(preset => (
                   <div
                     key={preset.id}
-                    className="border rounded-md p-3 cursor-pointer hover:border-primary transition-all"
+                    className="border rounded-md p-3 cursor-pointer hover:border-primary transition-all flex flex-col"
                     onClick={() => handlePresetSelect(preset)}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium">{preset.name}</h3>
+                      <h3 className="font-medium text-sm sm:text-base">{preset.name}</h3>
                       {!preset.id.startsWith('preset-') && (
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8"
+                          className="h-7 w-7"
                           onClick={(e) => handleDeletePreset(preset.id, preset.name, e)}
+                          title="Delete preset"
                         >
-                          <Trash size={16} />
+                          <Trash size={14} />
                         </Button>
                       )}
                     </div>
                     {preset.thumbnail && (
-                      <div className="h-24 w-full overflow-hidden rounded-md mb-2">
+                      <div className="h-20 sm:h-24 w-full overflow-hidden rounded-md mb-2">
                         <img src={preset.thumbnail} alt={preset.name} className="w-full h-full object-cover" />
                       </div>
                     )}
                     {preset.description && (
-                      <p className="text-sm text-muted-foreground">{preset.description}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{preset.description}</p>
                     )}
                   </div>
                 ))
               ) : (
-                <div className="col-span-2 text-center py-8">
+                <div className="col-span-1 sm:col-span-2 text-center py-8">
                   <p className="text-muted-foreground">No presets found</p>
                 </div>
               )}
@@ -212,23 +213,23 @@ export default function PresetSelector({
               Apply art history style themes to your artwork. These will modify your current settings.
             </p>
             
-            <div className="grid grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto p-1">
               {themes.map(theme => (
                 <div
                   key={theme.id}
-                  className="border rounded-md p-3 cursor-pointer hover:border-primary transition-all"
+                  className="border rounded-md p-3 cursor-pointer hover:border-primary transition-all flex flex-col"
                   onClick={() => handleThemeSelect(theme)}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">{theme.name}</h3>
-                    <Wand2 size={16} className="text-muted-foreground" />
+                    <h3 className="font-medium text-sm sm:text-base">{theme.name}</h3>
+                    <Wand2 size={16} className="text-primary/70" />
                   </div>
                   {theme.preview && (
-                    <div className="h-24 w-full overflow-hidden rounded-md mb-2">
+                    <div className="h-20 sm:h-24 w-full overflow-hidden rounded-md mb-2">
                       <img src={theme.preview} alt={theme.name} className="w-full h-full object-cover" />
                     </div>
                   )}
-                  <p className="text-sm text-muted-foreground">{theme.description}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{theme.description}</p>
                 </div>
               ))}
             </div>

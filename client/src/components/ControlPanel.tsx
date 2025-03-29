@@ -211,8 +211,8 @@ export default function ControlPanel({
   };
 
   return (
-    <div className="md:w-1/3 bg-white rounded-lg shadow-md p-5 h-auto">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 pb-2 border-b border-gray-100">Art Controls</h2>
+    <div className="w-full bg-white rounded-lg shadow-md p-3 sm:p-5 h-auto">
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 text-gray-800 pb-2 border-b border-gray-100">Art Controls</h2>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-4">
         <TabsList className="w-full grid grid-cols-3">
@@ -622,9 +622,12 @@ export default function ControlPanel({
       {/* Generate Button */}
       <Button 
         onClick={onGenerate}
-        className="w-full py-6 bg-accent hover:bg-accent/90 text-white"
+        className="w-full py-4 sm:py-6 mt-4 bg-primary hover:bg-primary/90 text-white font-semibold"
       >
-        <i className="ri-magic-line mr-2"></i> Generate New Artwork
+        <span className="flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sparkles"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M3 5h4"/><path d="M19 17v4"/><path d="M17 19h4"/></svg>
+          Generate New Artwork
+        </span>
       </Button>
     </div>
   );

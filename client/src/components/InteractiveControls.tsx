@@ -101,52 +101,52 @@ export default function InteractiveControls({
             <RadioGroup 
               value={currentMode} 
               onValueChange={(val) => handleModeChange(val as InteractionMode)}
-              className="grid grid-cols-2 gap-4"
+              className="grid grid-cols-2 sm:grid-cols-3 gap-3"
             >
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 bg-gray-50 p-2 rounded-md hover:bg-gray-100 transition-colors">
                 <RadioGroupItem value={InteractionMode.NONE} id="none" />
-                <Label htmlFor="none" className="flex items-center gap-2 cursor-pointer">
-                  <MousePointer size={18} />
+                <Label htmlFor="none" className="flex items-center gap-2 cursor-pointer text-sm">
+                  <MousePointer size={16} className="flex-shrink-0" />
                   <span>None</span>
                 </Label>
               </div>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 bg-gray-50 p-2 rounded-md hover:bg-gray-100 transition-colors">
                 <RadioGroupItem value={InteractionMode.FOLLOW} id="follow" />
-                <Label htmlFor="follow" className="flex items-center gap-2 cursor-pointer">
-                  <Hand size={18} />
+                <Label htmlFor="follow" className="flex items-center gap-2 cursor-pointer text-sm">
+                  <Hand size={16} className="flex-shrink-0" />
                   <span>Follow</span>
                 </Label>
               </div>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 bg-gray-50 p-2 rounded-md hover:bg-gray-100 transition-colors">
                 <RadioGroupItem value={InteractionMode.REPEL} id="repel" />
-                <Label htmlFor="repel" className="flex items-center gap-2 cursor-pointer">
-                  <Magnet size={18} className="transform rotate-180" />
+                <Label htmlFor="repel" className="flex items-center gap-2 cursor-pointer text-sm">
+                  <Magnet size={16} className="transform rotate-180 flex-shrink-0" />
                   <span>Repel</span>
                 </Label>
               </div>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 bg-gray-50 p-2 rounded-md hover:bg-gray-100 transition-colors">
                 <RadioGroupItem value={InteractionMode.ATTRACT} id="attract" />
-                <Label htmlFor="attract" className="flex items-center gap-2 cursor-pointer">
-                  <Magnet size={18} />
+                <Label htmlFor="attract" className="flex items-center gap-2 cursor-pointer text-sm">
+                  <Magnet size={16} className="flex-shrink-0" />
                   <span>Attract</span>
                 </Label>
               </div>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 bg-gray-50 p-2 rounded-md hover:bg-gray-100 transition-colors">
                 <RadioGroupItem value={InteractionMode.DRAW} id="draw" />
-                <Label htmlFor="draw" className="flex items-center gap-2 cursor-pointer">
-                  <PenTool size={18} />
+                <Label htmlFor="draw" className="flex items-center gap-2 cursor-pointer text-sm">
+                  <PenTool size={16} className="flex-shrink-0" />
                   <span>Draw</span>
                 </Label>
               </div>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 bg-gray-50 p-2 rounded-md hover:bg-gray-100 transition-colors">
                 <RadioGroupItem value={InteractionMode.EXPAND} id="expand" />
-                <Label htmlFor="expand" className="flex items-center gap-2 cursor-pointer">
-                  <Maximize size={18} />
+                <Label htmlFor="expand" className="flex items-center gap-2 cursor-pointer text-sm">
+                  <Maximize size={16} className="flex-shrink-0" />
                   <span>Expand</span>
                 </Label>
               </div>
@@ -229,13 +229,14 @@ export default function InteractiveControls({
           </TabsContent>
         </Tabs>
         
-        <div className="flex justify-end mt-4">
+        <div className="flex justify-center sm:justify-end mt-4">
           <Button
             variant={currentMode === InteractionMode.NONE ? "outline" : "default"}
             onClick={() => handleModeChange(
               currentMode === InteractionMode.NONE ? InteractionMode.FOLLOW : InteractionMode.NONE
             )}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 w-full sm:w-auto"
+            size="sm"
           >
             {currentMode === InteractionMode.NONE ? (
               <>

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { RefreshCw, Download, Share } from "lucide-react";
 
 interface HeaderProps {
   onReset: () => void;
@@ -12,37 +13,45 @@ export default function Header({
   onShare
 }: HeaderProps) {
   return (
-    <header className="mb-8">
-      <div className="flex flex-col sm:flex-row justify-between items-center">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 flex items-center">
+    <header className="mb-4 sm:mb-6">
+      <div className="flex flex-wrap justify-between items-center gap-4">
+        <div className="w-full sm:w-auto flex justify-between items-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center">
             <span className="text-primary">Art</span>
             <span className="text-secondary-500">Gen</span>
-            <span className="ml-2 text-lg text-gray-500 font-sans">| Create Your Masterpiece</span>
+            <span className="ml-2 text-sm sm:text-lg text-gray-500 font-light hidden sm:inline-block">| Create Your Masterpiece</span>
           </h1>
-          <p className="text-gray-600 mt-1">Generate beautiful algorithmic art with simple controls</p>
         </div>
-        <div className="mt-4 sm:mt-0 flex space-x-3">
+        
+        <div className="w-full sm:w-auto flex justify-between gap-2 sm:gap-3">
           <Button 
             variant="secondary"
             onClick={onReset}
-            className="flex items-center px-4 py-2"
+            size="sm"
+            className="flex items-center gap-1 flex-1 sm:flex-initial"
           >
-            <i className="ri-refresh-line mr-1"></i> New
+            <RefreshCw size={16} />
+            <span className="sm:inline">New</span>
           </Button>
+          
           <Button
             variant="default"
             onClick={onDownload}
-            className="flex items-center px-4 py-2"
+            size="sm"
+            className="flex items-center gap-1 flex-1 sm:flex-initial"
           >
-            <i className="ri-download-line mr-1"></i> Download
+            <Download size={16} />
+            <span className="sm:inline">Download</span>
           </Button>
+          
           <Button
             variant="outline"
             onClick={onShare}
-            className="flex items-center px-4 py-2"
+            size="sm"
+            className="flex items-center gap-1 flex-1 sm:flex-initial"
           >
-            <i className="ri-share-line mr-1"></i> Share
+            <Share size={16} />
+            <span className="sm:inline">Share</span>
           </Button>
         </div>
       </div>

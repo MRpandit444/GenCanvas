@@ -4,7 +4,8 @@ import { InteractionManager, InteractionMode } from '@/lib/interactionManager';
 import { ArtParams, SavedArtwork } from '@/types/art';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Download, Download as SVGIcon } from 'lucide-react';
+import { Download, FileType } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
 
 interface ArtCanvasProps {
   params: ArtParams;
@@ -151,43 +152,71 @@ export default function ArtCanvas({
   // Calculate canvas size based on container and device
   const getCanvasSize = () => {
     if (typeof window !== 'undefined') {
-      const maxWidth = Math.min(window.innerWidth - 40, 800);
+      // For mobile, use almost full width
+      if (window.innerWidth < 768) {
+        const width = window.innerWidth - 32; // Account for padding
+        return { width, height: width * 0.75 }; // 4:3 aspect ratio
+      }
+      
+      // For tablets and larger screens
+      const maxWidth = Math.min(window.innerWidth * 0.65, 900);
       const height = maxWidth * 0.75; // 4:3 aspect ratio
       return { width: maxWidth, height };
     }
     return { width: 600, height: 450 };
   };
 
-  const canvasSize = getCanvasSize();
+  // Use state to handle window resizing
+  const [canvasSize, setCanvasSize] = useState(getCanvasSize());
+  
+  // Update canvas size on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setCanvasSize(getCanvasSize());
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
-    <div className="mb-4 bg-white p-4 rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="text-xl font-semibold text-gray-800">Your Artwork</h2>
-        <div className="flex space-x-2">
+    <div className="mb-4 bg-white p-3 sm:p-4 rounded-lg shadow-md">
+      <div className="flex flex-wrap justify-between items-center mb-3 gap-2">
+        <div className="flex items-center">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Your Artwork</h2>
           {isGenerating && (
-            <span className="text-sm text-primary animate-pulse">Generating...</span>
+            <Badge variant="outline" className="ml-2 text-xs bg-primary/10 text-primary animate-pulse">
+              Generating...
+            </Badge>
           )}
+          {interactionMode !== InteractionMode.NONE && (
+            <Badge variant="outline" className="ml-2 text-xs bg-blue-50 text-blue-600">
+              Interactive: {interactionMode}
+            </Badge>
+          )}
+        </div>
+        <div className="flex gap-2">
           <Button 
             size="sm" 
             variant="outline"
             onClick={handleSVGExport}
             disabled={!canvasReady || isGenerating}
+            className="text-xs sm:text-sm"
           >
-            <SVGIcon className="h-4 w-4 mr-1" />
-            Export SVG
+            <FileType className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+            <span className="hidden sm:inline">Export</span> SVG
           </Button>
         </div>
       </div>
       
       <div className="relative">
         {!canvasReady && (
-          <Skeleton className="w-full h-[400px] rounded-lg" />
+          <Skeleton className="w-full aspect-[4/3] rounded-lg" />
         )}
         <div 
           id="canvas-container" 
           ref={containerRef} 
-          className="w-full overflow-hidden rounded-lg"
+          className="w-full overflow-hidden rounded-lg border border-gray-100"
           style={{ 
             display: canvasReady ? 'block' : 'none',
             height: `${canvasSize.height}px`,
@@ -200,10 +229,17 @@ export default function ArtCanvas({
       </div>
       
       {params.animated && (
-        <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-yellow-800">
+        <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-md text-xs sm:text-sm text-yellow-800 flex items-center gap-2">
+          <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
           Animation is active. The artwork will evolve over time.
         </div>
       )}
+      
+      <div className="mt-2 text-xs text-gray-500 flex flex-wrap gap-1">
+        {interactionMode !== InteractionMode.NONE && (
+          <p className="w-full">Tip: Click or drag on the canvas to interact with your artwork.</p>
+        )}
+      </div>
     </div>
   );
 }
