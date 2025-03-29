@@ -275,7 +275,21 @@ export default function ControlPanel({
               {shapes.map((shape) => (
                 <div 
                   key={shape.id}
-                  onClick={() => handleChange('shape', shape.id)}
+                  onClick={() => {
+                    // Update both global shape and active layer shape
+                    const newParams = { ...updatedParams, shape: shape.id };
+                    // Also update the active layer's shape
+                    const newLayers = [...newParams.layers];
+                    if (newLayers[newParams.activeLayer]) {
+                      newLayers[newParams.activeLayer] = {
+                        ...newLayers[newParams.activeLayer],
+                        shape: shape.id
+                      };
+                      newParams.layers = newLayers;
+                    }
+                    setUpdatedParams(newParams);
+                    onParamsChange(newParams);
+                  }}
                   className={`flex flex-col items-center p-2 rounded-md cursor-pointer transition-all border-2 ${
                     updatedParams.shape === shape.id 
                       ? 'border-primary bg-primary-50' 
@@ -298,7 +312,21 @@ export default function ControlPanel({
               {patterns.map((pattern) => (
                 <div 
                   key={pattern.id}
-                  onClick={() => handleChange('pattern', pattern.id)}
+                  onClick={() => {
+                    // Update both global pattern and active layer pattern
+                    const newParams = { ...updatedParams, pattern: pattern.id };
+                    // Also update the active layer's pattern
+                    const newLayers = [...newParams.layers];
+                    if (newLayers[newParams.activeLayer]) {
+                      newLayers[newParams.activeLayer] = {
+                        ...newLayers[newParams.activeLayer],
+                        pattern: pattern.id
+                      };
+                      newParams.layers = newLayers;
+                    }
+                    setUpdatedParams(newParams);
+                    onParamsChange(newParams);
+                  }}
                   className={`flex items-center p-3 rounded-md cursor-pointer transition-all border-2 ${
                     updatedParams.pattern === pattern.id 
                       ? 'border-primary bg-primary-50' 
@@ -326,7 +354,21 @@ export default function ControlPanel({
               max={200}
               step={5}
               className="w-full"
-              onValueChange={(value) => handleChange('complexity', value[0])}
+              onValueChange={(value) => {
+                // Update both global complexity and active layer complexity
+                const newParams = { ...updatedParams, complexity: value[0] };
+                // Also update the active layer's complexity
+                const newLayers = [...newParams.layers];
+                if (newLayers[newParams.activeLayer]) {
+                  newLayers[newParams.activeLayer] = {
+                    ...newLayers[newParams.activeLayer],
+                    complexity: value[0]
+                  };
+                  newParams.layers = newLayers;
+                }
+                setUpdatedParams(newParams);
+                onParamsChange(newParams);
+              }}
             />
           </div>
           
@@ -342,7 +384,21 @@ export default function ControlPanel({
               max={50}
               step={1}
               className="w-full"
-              onValueChange={(value) => handleChange('elementSize', value[0])}
+              onValueChange={(value) => {
+                // Update both global elementSize and active layer elementSize
+                const newParams = { ...updatedParams, elementSize: value[0] };
+                // Also update the active layer's elementSize
+                const newLayers = [...newParams.layers];
+                if (newLayers[newParams.activeLayer]) {
+                  newLayers[newParams.activeLayer] = {
+                    ...newLayers[newParams.activeLayer],
+                    elementSize: value[0]
+                  };
+                  newParams.layers = newLayers;
+                }
+                setUpdatedParams(newParams);
+                onParamsChange(newParams);
+              }}
             />
           </div>
           
@@ -358,7 +414,21 @@ export default function ControlPanel({
               max={100}
               step={5}
               className="w-full"
-              onValueChange={(value) => handleChange('randomness', value[0])}
+              onValueChange={(value) => {
+                // Update both global randomness and active layer randomness
+                const newParams = { ...updatedParams, randomness: value[0] };
+                // Also update the active layer's randomness
+                const newLayers = [...newParams.layers];
+                if (newLayers[newParams.activeLayer]) {
+                  newLayers[newParams.activeLayer] = {
+                    ...newLayers[newParams.activeLayer],
+                    randomness: value[0]
+                  };
+                  newParams.layers = newLayers;
+                }
+                setUpdatedParams(newParams);
+                onParamsChange(newParams);
+              }}
             />
           </div>
         </TabsContent>
