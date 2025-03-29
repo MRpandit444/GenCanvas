@@ -40,7 +40,28 @@ export default function Home() {
     pattern: 'scatter',
     complexity: 50,
     elementSize: 20,
-    randomness: 50
+    randomness: 50,
+    // New parameters
+    animated: false,
+    animationSpeed: 5,
+    useGradientBackground: false,
+    backgroundColor: '#0f172a',
+    backgroundEndColor: '#334155',
+    filterEffect: 'none',
+    filterIntensity: 50,
+    layers: [{
+      id: `layer_${Date.now()}`,
+      visible: true,
+      opacity: 100,
+      blendMode: 'source-over',
+      shape: 'circle',
+      pattern: 'scatter',
+      palette: 0,
+      complexity: 50,
+      elementSize: 20,
+      randomness: 50
+    }],
+    activeLayer: 0
   });
 
   // Load shared artwork if artId is present
@@ -70,12 +91,15 @@ export default function Home() {
   useEffect(() => {
     if (sharedArtwork && !sharedArtLoaded) {
       try {
-        setArtParams(sharedArtwork.settings);
-        setSharedArtLoaded(true);
-        toast({
-          title: "Shared artwork loaded",
-          description: "You are viewing a shared artwork"
-        });
+        // Make sure we have settings property
+        if (sharedArtwork && typeof sharedArtwork === 'object' && sharedArtwork !== null && 'settings' in sharedArtwork) {
+          setArtParams(sharedArtwork.settings as ArtParams);
+          setSharedArtLoaded(true);
+          toast({
+            title: "Shared artwork loaded",
+            description: "You are viewing a shared artwork"
+          });
+        }
       } catch (e) {
         console.error('Failed to load shared artwork:', e);
         toast({

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { ArtGenerator } from '@/lib/artGenerator';
 import { ArtParams, SavedArtwork } from '@/types/art';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Download, Download as SVGIcon } from 'lucide-react';
 
 interface ArtCanvasProps {
   params: ArtParams;
@@ -56,7 +58,8 @@ export default function ArtCanvas({
             const imageUrl = canvas.toDataURL('image/png');
             onArtworkGenerated({
               imageUrl,
-              settings: { ...params }
+              settings: { ...params },
+              format: "png"
             });
           }
         }, 200); // Small delay to ensure canvas is rendered
@@ -64,13 +67,60 @@ export default function ArtCanvas({
     }
   }, [params, isGenerating, canvasReady]);
 
+  const handleSVGExport = () => {
+    if (artGenerator) {
+      const svgContent = artGenerator.generateSVG();
+      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const link = document.createElement('a');
+      link.href = svgUrl;
+      link.download = `artgen-${timestamp}.svg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(svgUrl);
+      
+      // Also save to gallery with SVG format
+      onArtworkGenerated({
+        imageUrl: svgUrl,
+        settings: { ...params },
+        format: "svg"
+      });
+    }
+  };
+
+  // Calculate canvas size based on container and device
+  const getCanvasSize = () => {
+    if (typeof window !== 'undefined') {
+      const maxWidth = Math.min(window.innerWidth - 40, 800);
+      const height = maxWidth * 0.75; // 4:3 aspect ratio
+      return { width: maxWidth, height };
+    }
+    return { width: 600, height: 450 };
+  };
+
+  const canvasSize = getCanvasSize();
+
   return (
     <div className="mb-4 bg-white p-4 rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-xl font-semibold text-gray-800">Your Artwork</h2>
-        {isGenerating && (
-          <span className="text-sm text-primary animate-pulse">Generating...</span>
-        )}
+        <div className="flex space-x-2">
+          {isGenerating && (
+            <span className="text-sm text-primary animate-pulse">Generating...</span>
+          )}
+          <Button 
+            size="sm" 
+            variant="outline"
+            onClick={handleSVGExport}
+            disabled={!canvasReady || isGenerating}
+          >
+            <SVGIcon className="h-4 w-4 mr-1" />
+            Export SVG
+          </Button>
+        </div>
       </div>
       
       <div className="relative">
@@ -81,11 +131,22 @@ export default function ArtCanvas({
           id="canvas-container" 
           ref={containerRef} 
           className="w-full overflow-hidden rounded-lg"
-          style={{ display: canvasReady ? 'block' : 'none' }}
+          style={{ 
+            display: canvasReady ? 'block' : 'none',
+            height: `${canvasSize.height}px`,
+            maxWidth: `${canvasSize.width}px`,
+            margin: '0 auto'
+          }}
         >
           {/* p5.js canvas will be injected here */}
         </div>
       </div>
+      
+      {params.animated && (
+        <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-yellow-800">
+          Animation is active. The artwork will evolve over time.
+        </div>
+      )}
     </div>
   );
 }
