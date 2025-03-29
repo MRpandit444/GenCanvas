@@ -5,11 +5,22 @@ import ControlPanel from '@/components/ControlPanel';
 import ArtCanvas from '@/components/ArtCanvas';
 import Gallery from '@/components/Gallery';
 import ShareModal from '@/components/ShareModal';
+import PresetSelector from '@/components/PresetSelector';
+import InteractiveControls from '@/components/InteractiveControls';
 import { ArtGenerator } from '@/lib/artGenerator';
+import { InteractionMode } from '@/lib/interactionManager';
 import { ArtParams, ColorPalette, SavedArtwork } from '@/types/art';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
+
+// Type for interaction parameters
+interface InteractionParams {
+  strength: number;
+  radius: number;
+  fadeSpeed: number;
+  [key: string]: any; // Allow additional properties
+}
 
 export default function Home() {
   const { artId } = useParams();
@@ -20,6 +31,15 @@ export default function Home() {
   const [savedArtworks, setSavedArtworks] = useState<SavedArtwork[]>([]);
   const [sharedArtLoaded, setSharedArtLoaded] = useState(false);
   const generatorRef = useRef<ArtGenerator | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  
+  // Interactive mode state
+  const [interactionMode, setInteractionMode] = useState<InteractionMode>(InteractionMode.NONE);
+  const [interactionParams, setInteractionParams] = useState<InteractionParams>({
+    strength: 50,
+    radius: 150,
+    fadeSpeed: 3
+  });
 
   // Default color palettes
   const colorPalettes: ColorPalette[] = [
@@ -204,6 +224,58 @@ export default function Home() {
     });
   };
 
+  // Load preset settings
+  const handleLoadPreset = (settings: ArtParams) => {
+    setArtParams(settings);
+    // When loading a preset, disable interactive mode
+    setInteractionMode(InteractionMode.NONE);
+    generateArtwork();
+    
+    toast({
+      title: "Preset Loaded",
+      description: "Preset settings have been applied"
+    });
+  };
+
+  // Apply art theme
+  const handleApplyTheme = (settings: ArtParams) => {
+    setArtParams(settings);
+    // When applying a theme, disable interactive mode
+    setInteractionMode(InteractionMode.NONE);
+    generateArtwork();
+    
+    toast({
+      title: "Art Style Applied",
+      description: "Art history style has been applied"
+    });
+  };
+
+  // Handle interaction mode change
+  const handleInteractionModeChange = (mode: InteractionMode) => {
+    setInteractionMode(mode);
+    
+    // If enabling interaction mode, turn off animation
+    if (mode !== InteractionMode.NONE && artParams.animated) {
+      setArtParams({
+        ...artParams,
+        animated: false
+      });
+      
+      toast({
+        title: "Animation Disabled",
+        description: "Animation has been turned off for interactive mode"
+      });
+    }
+  };
+  
+  // Handle interaction parameters change
+  const handleInteractionParamsChange = (params: Partial<InteractionParams>) => {
+    setInteractionParams(prevParams => ({
+      ...prevParams,
+      ...params
+    }));
+  };
+
   const shareArtwork = async () => {
     try {
       // Create a new shared artwork entry on the backend
@@ -247,12 +319,30 @@ export default function Home() {
           onShare={shareArtwork}
         />
         
-        <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
-          <ControlPanel 
-            params={artParams}
-            onParamsChange={setArtParams}
-            onGenerate={generateArtwork}
+        <div className="flex items-center justify-end space-x-2 mb-4">
+          <PresetSelector
+            currentParams={artParams}
+            onSelectPreset={handleLoadPreset}
+            onSelectTheme={handleApplyTheme}
+            colorPalettes={colorPalettes}
+            canvasRef={canvasRef}
           />
+        </div>
+        
+        <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
+          <div className="md:w-1/3 space-y-6">
+            <ControlPanel 
+              params={artParams}
+              onParamsChange={setArtParams}
+              onGenerate={generateArtwork}
+            />
+            
+            <InteractiveControls
+              onModeChange={handleInteractionModeChange}
+              onParamsChange={handleInteractionParamsChange}
+              currentMode={interactionMode}
+            />
+          </div>
           
           <div className="md:w-2/3 space-y-6">
             <ArtCanvas 
@@ -260,6 +350,8 @@ export default function Home() {
               isGenerating={isGenerating}
               onArtworkGenerated={handleArtworkGenerated}
               generatorRef={generatorRef}
+              interactionMode={interactionMode}
+              interactionParams={interactionParams}
             />
             
             <Gallery 

@@ -68,3 +68,20 @@ export interface BlendMode {
   name: string;
   p5Mode: string | undefined;
 }
+
+export interface Preset {
+  id: string;
+  name: string;
+  description?: string;
+  settings: ArtParams;
+  thumbnail?: string;
+  createdAt: number;
+}
+
+export interface ArtTheme {
+  id: string;
+  name: string;
+  description: string;
+  settings: Partial<ArtParams>;
+  preview?: string;
+}

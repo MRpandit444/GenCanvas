@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArtGenerator } from '@/lib/artGenerator';
+import { InteractionManager, InteractionMode } from '@/lib/interactionManager';
 import { ArtParams, SavedArtwork } from '@/types/art';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -10,16 +11,22 @@ interface ArtCanvasProps {
   isGenerating: boolean;
   onArtworkGenerated: (artwork: SavedArtwork) => void;
   generatorRef?: React.MutableRefObject<ArtGenerator | null>;
+  interactionMode?: InteractionMode;
+  interactionParams?: Record<string, any>;
 }
 
 export default function ArtCanvas({
   params,
   isGenerating,
   onArtworkGenerated,
-  generatorRef
+  generatorRef,
+  interactionMode = InteractionMode.NONE,
+  interactionParams = {}
 }: ArtCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [artGenerator, setArtGenerator] = useState<ArtGenerator | null>(null);
+  const [interactionManager, setInteractionManager] = useState<InteractionManager | null>(null);
   const [canvasReady, setCanvasReady] = useState(false);
 
   useEffect(() => {
@@ -32,10 +39,30 @@ export default function ArtCanvas({
         generatorRef.current = generator;
       }
       
-      setCanvasReady(true);
+      // Store reference to the canvas
+      setTimeout(() => {
+        if (generator.p5Instance) {
+          // Get the canvas element from the DOM since it's not directly accessible via p5 instance
+          const canvasElement = containerRef.current?.querySelector('canvas');
+          if (canvasElement) {
+            canvasRef.current = canvasElement;
+            
+            // Initialize interaction manager
+            const manager = new InteractionManager();
+            manager.initialize(generator, canvasElement);
+            setInteractionManager(manager);
+          }
+        }
+        setCanvasReady(true);
+      }, 100);
     }
 
     return () => {
+      if (interactionManager) {
+        interactionManager.destroy();
+        setInteractionManager(null);
+      }
+      
       if (artGenerator) {
         artGenerator.destroy();
         setArtGenerator(null);
@@ -66,6 +93,36 @@ export default function ArtCanvas({
       }
     }
   }, [params, isGenerating, canvasReady]);
+  
+  // Handle interaction mode changes
+  useEffect(() => {
+    if (interactionManager) {
+      interactionManager.setMode(interactionMode);
+      
+      // Modify the p5 draw function to include interactions
+      if (artGenerator && artGenerator.p5Instance) {
+        const oldDraw = artGenerator.p5Instance.draw;
+        
+        // Override the p5 draw function to include interactions
+        artGenerator.p5Instance.draw = () => {
+          // First do the normal drawing
+          oldDraw();
+          
+          // Then apply the interaction effects
+          if (interactionMode !== InteractionMode.NONE) {
+            interactionManager.applyInteraction(artGenerator.p5Instance, params);
+          }
+        };
+      }
+    }
+  }, [interactionMode, interactionManager]);
+  
+  // Handle interaction parameter changes
+  useEffect(() => {
+    if (interactionManager) {
+      interactionManager.setParams(interactionParams);
+    }
+  }, [interactionParams, interactionManager]);
 
   const handleSVGExport = () => {
     if (artGenerator) {
